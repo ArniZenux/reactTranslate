@@ -1,7 +1,7 @@
 export function Footer() {
   return (
     <footer>
-      ©Svartrotta ehf  - <a href="https://github.com/ArniZenux/translate">Sjá github</a>
+      ©Svartrotta ehf  - <a href="https://github.com/ArniZenux/reactTranslate">Sjá github</a>
     </footer>
   )
 }

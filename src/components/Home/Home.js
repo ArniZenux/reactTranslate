@@ -3,15 +3,16 @@ import React, {useEffect, useState } from 'react';
 const apiUrl = process.env.REACT_APP_API_URL;
 
 export function Home() {
-  const [count, setCount] = useState(null);
-  //const [text, setText] = useState('');
+  const [nafn, setNafn] = useState('');
+  const [loading, setLoading] = useState(false); 
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(null);
+  const [count, setCount] = useState(0);
   
   let teljari = 0; 
   const max = 1000; 
-  
+
   const recounter = e => {
+    setNafn(e.target.value); 
     teljari = e.target.value.length; 
     if( teljari <= max ) setCount(teljari);
   }
@@ -20,7 +21,6 @@ export function Home() {
     async function getData(){
     setLoading(true);
     setError(null); 
-    let json;
     
     try {
       const result = await fetch(apiUrl + `/translate`); 
@@ -29,43 +29,77 @@ export function Home() {
       if(!result.ok){
         throw new Error('Ekki ok');
       }
-      json = await result.json();
     }
     catch(e){
       console.warn('unable to fetch data', e); 
-      setError('Gat ekki sótt efni í vefþjónustu - Bilað í þjónustuna.');
+      setError('Nær ekki í samband við vefþjónustuna.');
       return; 
     }
     finally{
       setLoading(false); 
     }
-    }
- 
+   }
+  getData(); 
   }, []);
 
-  const onSubmit = async (e) => {
-    console.log(apiUrl); 
+  if(error){
+    return(
+      <div> 
+        <h2> Error - Engin í samband við þjónustuna </h2>
+      </div>
+    )
   }
-  /*const onSubmit = async (e) => {
-    let success = true; 
-    const info = 'arni';
-    console.log('Hello log');
+
+  if(loading){
+    return( 
+        <div> 
+          <h2> Loading - Augnblik! </h2> 
+        </div>
+    )
+  }
+
+  let success = true; 
+  //let success2 = true; 
+
+  /*async function callProfa(){
+    const result = await fetch(apiUrl + `/profaTranslate`); 
+    console.log(result); 
+  }*/
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = { nafn };
+    
     const requestOptions = {
       method: 'POST',
-      headers: {"Content-Type": "application/json" },
-      body: JSON.stringify(info)
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify( data )
+    };
+
+    const requestOptions2 = {
+      method: 'GET',
+      headers: {"Content-Type": "application/json"},
     };
     
-    console.log(apiUrl); 
+    //console.log(data); 
+    console.log(requestOptions);
+    console.log(requestOptions2);
+    
+    success = await fetch(apiUrl + `/translate`, requestOptions);
+    
+    const result2 = await fetch(apiUrl + `/profaTranslate`, requestOptions2); 
+    console.log(result2); 
 
-    success = await fetch(apiUrl + '/translate', requestOptions);
     if(success){
-      console.log('success');
+      console.log('it work');
+      const result2 = await fetch(apiUrl + `/profaTranslate`, requestOptions2); 
+      console.log(result2); 
     }
-    else{
-      console.log(apiUrl);
+    else { 
+      console.log('It will not work');
     }
-  }*/
+  }
     
   return(
     <div classNAme='grid'>

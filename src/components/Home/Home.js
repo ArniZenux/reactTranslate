@@ -4,6 +4,8 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
 export function Home() {
   const [nafn, setNafn] = useState('');
+  const [setning, setSetning] = useState('');
+
   const [loading, setLoading] = useState(false); 
   const [error, setError] = useState(null);
   const [count, setCount] = useState(0);
@@ -13,6 +15,7 @@ export function Home() {
 
   const recounter = e => {
     setNafn(e.target.value); 
+
     teljari = e.target.value.length; 
     if( teljari <= max ) setCount(teljari);
   }
@@ -24,7 +27,7 @@ export function Home() {
     
     try {
       const result = await fetch(apiUrl + `/translate`); 
-      console.log(result); 
+      //console.log(result); 
       
       if(!result.ok){
         throw new Error('Ekki ok');
@@ -58,54 +61,36 @@ export function Home() {
     )
   }
 
-  let success = true; 
-  //let success2 = true; 
-
-  /*async function callProfa(){
-    const result = await fetch(apiUrl + `/profaTranslate`); 
-    console.log(result); 
-  }*/
-
   const onSubmit = async (e) => {
     e.preventDefault();
-
     const data = { nafn };
-    
-    const requestOptions = {
-      method: 'POST',
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify( data )
-    };
 
-    const requestOptions2 = {
-      method: 'GET',
-      headers: {"Content-Type": "application/json"},
-    };
-    
-    //console.log(data); 
-    console.log(requestOptions);
-    console.log(requestOptions2);
-    
-    success = await fetch(apiUrl + `/translate`, requestOptions);
-    
-    const result2 = await fetch(apiUrl + `/profaTranslate`, requestOptions2); 
-    console.log(result2); 
-
-    if(success){
-      console.log('it work');
-      const result2 = await fetch(apiUrl + `/profaTranslate`, requestOptions2); 
-      console.log(result2); 
+    try {
+      const requestOptions = {
+        method: 'POST',
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify( data )
+      }; 
+  
+      await fetch(apiUrl + `/translate`, requestOptions)
+      .then(response => {
+        return response.json() 
+      })
+      .then(data => {
+        setSetning(data); 
+      });
     }
-    else { 
-      console.log('It will not work');
+    catch(e){
+      console.warn('unable to fetch data', e); 
+      return; 
     }
   }
     
   return(
-    <div classNAme='grid'>
+    <div className='grid'>
       <div className='row'>
 
-        <div classNAme="col col-6">
+        <div className="col col-6">
           <div className="categories">
             <section>
               <h2>English</h2>
@@ -136,13 +121,17 @@ export function Home() {
               <h2>Icelandic</h2>
                 <form>
                   <div className="smallBox">
-                    <textarea className='textarea' id="newText" name="newText"></textarea>
+                    <textarea 
+                      className='textarea' 
+                      id="newText" 
+                      name="newText"
+                      defaultValue={setning}
+                    />                      
                   </div>
               </form>
             </section>
           </div>
         </div>
-
       </div>
     </div>
   )
